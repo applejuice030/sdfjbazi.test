@@ -531,10 +531,6 @@
                         score -= 30; currentReasons.push("⚠️ <b>地支相冲 (-30分)</b>：相爱相杀的欢喜冤家，需要极大的包容心来克服差异。");
                     }
 
-                    if (currentIdol.wuxing_need.includes(userWuxing)) {
-                        score += 30; currentReasons.push(`🔥 <b>五行互补 (+30分)</b>：你的日主【${userWuxing}】正是他命理中最渴望的能量。`);
-                    }
-
                     if (currentIdol.zodiac === userZodiac) {
                         score += 20; currentReasons.push("🌟 <b>星象同频 (+20分)</b>：同为" + userZodiac + "，你们连生活步调都出奇一致。");
                     }
