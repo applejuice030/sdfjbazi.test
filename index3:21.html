@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>楼孩命理契合度测试</title>
+    <style>
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans SC", "Noto Sans CJK SC", sans-serif;
+            background: #feb500;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: #ffffff;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            padding: 40px 30px;
+            border-radius: 20px;
+            width: 85%;
+            max-width: 420px;
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 50px; /* 给底部的版权留出空间 */
+        }
+
+        h2 { 
+            color: #2c3e50; 
+            margin-top: 0; 
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8); 
+        }
+
+        p { color: #555; font-size: 15px; }
+
+        input {
+            padding: 12px;
+            width: 80%;
+            margin-top: 15px;
+            background: #af2a2d;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            font-size: 16px;
+            color: #ffffff;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { 
+            background: #af2a2d; 
+            box-shadow: 0 0 10px rgba(255,255,255,0.5); 
+        }
+
+        button {
+            margin-top: 25px;
+            padding: 14px 35px;
+            background: #ffd627;
+            color: #333;
+            font-weight: bold;
+            border: 3px solid rgba(0, 0, 0, 0.6);
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        #result { margin-top: 30px; }
+
+        /* 底部版权署名样式 */
+        .footer {
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+            z-index: 100;
+        }
+        .footer a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            border-bottom: 1px dashed rgba(255,255,255,0.6);
+            padding-bottom: 2px;
+            transition: 0.3s;
+        }
+        .footer a:hover {
+            color: #af2a2d;
+            border-bottom-color: #af2a2d;
+        }  
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>✨ 楼孩命理契合度测试 ✨</h2>
+        <p>输入你的阳历生日，排算你的宿命羁绊！</p>
+        
+        <input type="date" id="userBirthday">
+        <br>
+        <button onclick="calculateBazi()">开启缘分匹配</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script src="https://unpkg.com/lunar-javascript/lunar.js"></script>
+
+    <script>
+        const idols = [/* 四代*/
+{ "name": “王橹杰”, "birthday": "2010-01-08”, "zodiac": “摩羯座", "bazi_nianyue": “己丑年 丁丑月", "bazi_rizhu": “戊午”, "wuxing_main": “土”},
+ {
+    "name": “左奇函“,
+    "birthday": "2010-03-19",
+    "zodiac": “双鱼座",
+    "bazi_nianyue": “庚寅年 己卯月",
+    "bazi_rizhu": “戊辰”,
+    "wuxing_main": “土”
+  }，
+ {
+    "name": “张函瑞“,
+    "birthday": "2009-10-18”,
+    "zodiac": “天秤座",
+    "bazi_nianyue": “己丑年 甲戌月",
+    "bazi_rizhu": “丙申”,
+    "wuxing_main": “土”
+  }，
+ {
+    "name": “陈奕恒“,
+    "birthday": "2010-05-09",
+    "zodiac": “金牛座",
+    "bazi_nianyue": “庚寅年 辛巳月",
+    "bazi_rizhu": “己未”,
+    "wuxing_main": “土”
+  }，
+{
+    "name": “陈浚铭“,
+    "birthday": "2012-05-17",
+    "zodiac": “金牛座",
+    "bazi_nianyue": “壬辰年 乙巳月",
+    "bazi_rizhu": “戊寅”,
+    "wuxing_main": “土”
+  }，
+{
+    "name": “张桂源“,
+    "birthday": "2009-05-11",
+    "zodiac": “金牛座",
+    "bazi_nianyue": “己丑年 己巳月",
+    "bazi_rizhu": “丙辰”,
+    "wuxing_main": “火”
+  }，
+{
+    "name": “杨博文“,
+    "birthday": "2010-06-01",
+    "zodiac": “双子座",
+    "bazi_nianyue": “庚寅年 辛巳月",
+    "bazi_rizhu": “壬午”,
+    "wuxing_main": “水”
+  }，
+{
+    "name": “陈思罕“,
+    "birthday": "2011-11-08",
+    "zodiac": “天蝎座",
+    "bazi_nianyue": “辛卯年 戊戌月",
+    "bazi_rizhu": “丁卯”,
+    "wuxing_main": “火”
+  }，
+{
+    "name": “李煜东“,
+    "birthday": "2012-03-15",
+    "zodiac": “双鱼座",
+    "bazi_nianyue": “壬辰年 癸卯月",
+    "bazi_rizhu": “乙亥”,
+    "wuxing_main": “水”
+  }，
+{
+    "name": “张奕然“,
+    "birthday": "2010-09-15",
+    "zodiac": “处女座",
+    "bazi_nianyue": “庚寅年 乙酉月",
+    "bazi_rizhu": “戊辰”,
+    "wuxing_main": “金”
+  }，
+{
+    "name": “聂玮辰“,
+    "birthday": "2011-02-18",
+    "zodiac": “水瓶座",
+    "bazi_nianyue": “辛卯年 庚寅月",
+    "bazi_rizhu": “甲辰”,
+    "wuxing_main": “木”
+  }，
+{
+    "name": “官俊臣“,
+    "birthday": "2007-07-04",
+    "zodiac": “巨蟹座",
+    "bazi_nianyue": “丁亥年 丙午月",
+    "bazi_rizhu": “己亥”,
+    "wuxing_main": “火”
+  }，
+{
+    "name": “魏子宸“,
+    "birthday": "2011-12-19",
+    "zodiac": “射手座",
+    "bazi_nianyue": “辛卯年 庚子月",
+    "bazi_rizhu": “戊申”,
+    "wuxing_main": “金”
+  }，
+{
+    "name": “杨涵博“,
+    "birthday": "2010-06-08",
+    "zodiac": “双子座",
+    "bazi_nianyue": “庚寅年 壬午月",
+    "bazi_rizhu": “己丑”,
+    "wuxing_main": “土”
+  }，
+{
+    "name": “王烁然“,
+    "birthday": "2010-03-15",
+    "zodiac": “双鱼座",
+    "bazi_nianyue": “庚寅年 己卯月",
+    "bazi_rizhu": “甲子”,
+    "wuxing_main": “木”
+  }，
+ /* 三代*/
+{
+    "name": “张子墨“,
+    "birthday": "2008-02-20",
+    "zodiac": “双鱼座",
+    "bazi_nianyue": “戊子年 甲寅月",
+    "bazi_rizhu": “庚寅”,
+    "wuxing_main": “木”
+  }，
+{
+    "name": “黄朔“,
+    "birthday": "2008-08-24",
+    "zodiac": “处女座",
+    "bazi_nianyue": “戊子年 庚申月",
+    "bazi_rizhu": “丙申”,
+    "wuxing_main": “金”
+  }，
+{
+    "name": “童禹坤“,
+    "birthday": "2006-07-07",
+    "zodiac": “巨蟹座",
+    "bazi_nianyue": “丙戌年 甲午月",
+    "bazi_rizhu": “丁酉”,
+    "wuxing_main": “火”
+  }，
+{
+    "name": “邓佳鑫“,
+    "birthday": "2006-07-23",
+    "zodiac": “狮子座",
+    "bazi_nianyue": “丙戌年 乙未月",
+    "bazi_rizhu": “癸丑”,
+    "wuxing_main": “土”
+  }，
+{
+    "name": “穆祉丞“,
+    "birthday": "2007-11-16",
+    "zodiac": “天蝎座",
+    "bazi_nianyue": “丁亥年 辛亥月",
+    "bazi_rizhu": “甲寅”,
+    "wuxing_main": “木”
+  }，
+{
+    "name": “张峻豪“,
+    "birthday": "2007-07-20",
+    "zodiac": “巨蟹座",
+    "bazi_nianyue": “丁亥年 丁未月",
+    "bazi_rizhu": “乙卯”,
+    "wuxing_main": “土”
+  }，
+{
+    "name": “余宇涵“,
+    "birthday": "2006-11-24",
+    "zodiac": “射手座",
+    "bazi_nianyue": “丙戌年 己亥月",
+    "bazi_rizhu": “丁巳”,
+    "wuxing_main": “火”
+  }，
+ /* 二代*/
+{
+    "name": “马嘉祺“,
+    "birthday": "2002-12-12",
+    "zodiac": “射手座",
+    "bazi_nianyue": “壬子年 壬子月",
+    "bazi_rizhu": “甲寅”,
+    "wuxing_main": “木”
+  }，
+{
+    "name": “丁程鑫“,
+    "birthday": "2002-02-24",
+    "zodiac": “天蝎座",
+    "bazi_nianyue": “壬午年 壬寅月",
+    "bazi_rizhu": “癸亥”,
+    "wuxing_main": “水”
+  }，
+{
+    "name": “宋亚轩“,
+    "birthday": "2004-03-04",
+    "zodiac": “双鱼座",
+    "bazi_nianyue": “甲申年 丙寅月",
+    "bazi_rizhu": “壬午”,
+    "wuxing_main": “木”
+  }，
+{
+    "name": “刘耀文“,
+    "birthday": "2005-09-23",
+    "zodiac": “处女座",
+    "bazi_nianyue": “乙酉年 乙酉月",
+    "bazi_rizhu": “庚戌”,
+    "wuxing_main": “金”
+  }，
+{
+    "name": “张真源“,
+    "birthday": "2003-04-16",
+    "zodiac": “白羊座",
+    "bazi_nianyue": “癸未年 丙辰月",
+    "bazi_rizhu": “己未”,
+    "wuxing_main": “土”
+  }，
+{
+    "name": “严浩翔“,
+    "birthday": "2004-08-16",
+    "zodiac": “狮子座",
+    "bazi_nianyue": “甲申年 壬申月",
+    "bazi_rizhu": “丁卯”,
+    "wuxing_main": “木”
+  }，
+{
+    "name": “贺峻霖“,
+    "birthday": "2004-06-15",
+    "zodiac": “双子座",
+    "bazi_nianyue": “甲申年 庚午月",
+    "bazi_rizhu": “乙丑”,
+    "wuxing_main": “土”
+  }，
+ /* tfboys*/
+{
+    "name": “王俊凯“,
+    "birthday": "1999-09-21",
+    "zodiac": “处女座",
+    "bazi_nianyue": “己卯年 癸酉月",
+    "bazi_rizhu": “丙子”,
+    "wuxing_main": “水”
+  }，
+{
+    "name": “王源“,
+    "birthday": "2000-11-08",
+    "zodiac": “天蝎座",
+    "bazi_nianyue": “庚辰年 丁亥月",
+    "bazi_rizhu": “庚午”,
+    "wuxing_main": “金”
+  }，
+{
+    "name": “易烊千玺“,
+    "birthday": "2000-11-28",
+    "zodiac": “射手座",
+    "bazi_nianyue": “庚辰年 丁亥月",
+    "bazi_rizhu": “庚寅”,
+    "wuxing_main": “金”
+  }，
+ /* 五代*/
+{
+    "name": “吕政熙“,
+    "birthday": "2012-02-20",
+    "zodiac": “双鱼座",
+    "bazi_nianyue": “壬辰年 壬寅月",
+    "bazi_rizhu": “辛亥”,
+    "wuxing_main": “水”
+  }，
+{
+    "name": “智恩涵“,
+    "birthday": "2013-09-24",
+    "zodiac": “天秤座",
+    "bazi_nianyue": “癸巳年 辛酉月",
+    "bazi_rizhu": “癸巳”,
+    "wuxing_main": “水”
+  }，
+{
+    "name": “朱映宸“,
+    "birthday": "2013-12-19",
+    "zodiac": “射手座",
+    "bazi_nianyue": “癸巳年 甲子月",
+    "bazi_rizhu": “己未”,
+    "wuxing_main": “土”
+  }，
+ {
+    "name": "朱志鑫",
+    "birthday": "2005-11-19",
+    "zodiac": "天蝎座",
+    "bazi_nianyue": "乙酉年 丁亥月",
+    "bazi_rizhu": "丁未",
+    "wuxing_main": "火"
+  }，
+  {
+    "name": "张极",
+    "birthday": "2007-02-03",
+    "zodiac": "水瓶座",
+    "bazi_nianyue": "丙戌年 辛丑月",
+    "bazi_rizhu": "戊辰",
+    "wuxing_main": "土"
+  },
+  {
+    "name": "左航",
+    "birthday": "2006-05-22",
+    "zodiac": "双子座",
+    "bazi_nianyue": "丙戌年 癸巳月",
+    "bazi_rizhu": "辛亥",
+    "wuxing_main": "金"
+  },
+  {
+    "name": "张泽禹",
+    "birthday": "2007-04-30",
+    "zodiac": "金牛座",
+    "bazi_nianyue": "丁亥年 甲辰月",
+    "bazi_rizhu": "甲午",
+    "wuxing_main": "木"
+  },
+{
+    "name": "苏新皓",
+    "birthday": "2007-01-12",
+    "zodiac": "摩羯座",
+    "bazi_nianyue": "丙戌年 辛丑月",
+    "bazi_rizhu": "丙午",
+    "wuxing_main": "火"
+  }
+];
+        const tianganWuxing = { "甲":"木", "乙":"木", "丙":"火", "丁":"火", "戊":"土", "己":"土", "庚":"金", "辛":"金", "壬":"水", "癸":"水" };
+        const ganWuHe = ["甲己", "乙庚", "丙辛", "丁壬", "戊癸"]; 
+        const zhiLiuHe = ["子丑", "寅亥", "卯戌", "辰酉", "巳申", "午未"]; 
+        const zhiLiuChong = ["子午", "丑未", "寅申", "卯酉", "辰戌", "巳亥"]; 
+        const ganXiangKe = ["甲庚", "乙辛", "丙壬", "丁癸", "甲戊", "乙己", "丙庚", "丁辛", "戊壬", "己癸"];
+        const winterZhi = ["亥", "子", "丑"]; 
+        const summerZhi = ["巳", "午", "未"]; 
+
+        function calculateBazi() {
+            let birthdayInput = document.getElementById('userBirthday').value;
+            if (!birthdayInput) { alert("请先选择你的生日哦！"); return; }
+
+            let parts = birthdayInput.split('-');
+            let year = parseInt(parts[0]);
+            let month = parseInt(parts[1]);
+            let day = parseInt(parts[2]);
+
+            try {
+                let solar = Solar.fromYmd(year, month, day);
+                let lunar = solar.getLunar(); 
+                
+                let userZodiac = solar.getXingZuo() + "座"; 
+                
+                let userYearGanZhi = lunar.getYearInGanZhi();
+                let userMonthGanZhi = lunar.getMonthInGanZhi();
+                let userDayGanZhi = lunar.getDayInGanZhi(); 
+                
+                let userYearGan = userYearGanZhi.charAt(0);
+                let userYearZhi = userYearGanZhi.charAt(1);
+                let userMonthGan = userMonthGanZhi.charAt(0);
+                let userMonthZhi = userMonthGanZhi.charAt(1);
+                let userDayGan = userDayGanZhi.charAt(0);         
+                let userDayZhi = userDayGanZhi.charAt(1);
+                
+                let userWuxing = tianganWuxing[userDayGan]; 
+
+                // 🚨 核心改动：用一个数组保存所有偶像的得分结果
+                let allResults = [];
+
+                for (let i = 0; i < idols.length; i++) {
+                    let currentIdol = idols[i];
+                    let score = 0;
+                    let currentReasons = [];
+
+                    let nianyueArr = currentIdol.bazi_nianyue.replace(/年|月/g, '').split(' ');
+                    let idolYearGanZhi = nianyueArr[0]; 
+                    let idolMonthGanZhi = nianyueArr[1];
+
+                    let idolYearGan = idolYearGanZhi.charAt(0);
+                    let idolYearZhi = idolYearGanZhi.charAt(1);
+                    let idolMonthGan = idolMonthGanZhi.charAt(0);
+                    let idolMonthZhi = idolMonthGanZhi.charAt(1);
+                    let idolDayGan = currentIdol.bazi_rizhu.charAt(0); 
+                    let idolDayZhi = currentIdol.bazi_rizhu.charAt(1); 
+
+                    let dayGanPair1 = userDayGan + idolDayGan;
+                    let dayGanPair2 = idolDayGan + userDayGan;
+                    let dayZhiPair1 = userDayZhi + idolDayZhi;
+                    let dayZhiPair2 = idolDayZhi + userDayZhi;
+                    
+                    let yearGanPair1 = userYearGan + idolYearGan;
+                    let yearGanPair2 = idolYearGan + userYearGan;
+                    let monthGanPair1 = userMonthGan + idolMonthGan;
+                    let monthGanPair2 = idolMonthGan + userMonthGan;
+
+                    if (ganWuHe.includes(dayGanPair1) || ganWuHe.includes(dayGanPair2)) {
+                        score += 40; currentReasons.push("✨ <b>日干相合 (+40分)</b>：思想高度共鸣，天生具有强烈的灵魂吸引力。");
+                    }
+                    if (zhiLiuHe.includes(dayZhiPair1) || zhiLiuHe.includes(dayZhiPair2)) {
+                        score += 50; currentReasons.push("💖 <b>日支暗合 (+50分)</b>：配偶宫相合，三观一致，相处极度舒适。");
+                    }
+                    if (ganXiangKe.includes(dayGanPair1) || ganXiangKe.includes(dayGanPair2)) {
+                        score -= 20; currentReasons.push("🌩️ <b>日干相克 (-20分)</b>：气场碰撞强烈，容易产生想要改变对方的冲动，相处中伴随摩擦与内耗。");
+                    }
+                    if (ganWuHe.includes(yearGanPair1) || ganWuHe.includes(yearGanPair2)) {
+                        score += 15; currentReasons.push("🕰️ <b>年柱相合 (+15分)</b>：宿命般的羁绊，初见时便会有一见如故的强烈熟悉感。");
+                    }
+                    if (ganWuHe.includes(monthGanPair1) || ganWuHe.includes(monthGanPair2)) {
+                        score += 25; currentReasons.push("🤝 <b>月柱相合 (+25分)</b>：事业与价值观的完美共振，是能互相成就的神仙拍档。");
+                    }
+
+                    let userIsWinter = winterZhi.includes(userMonthZhi);
+                    let userIsSummer = summerZhi.includes(userMonthZhi);
+                    let idolIsWinter = winterZhi.includes(idolMonthZhi);
+                    let idolIsSummer = summerZhi.includes(idolMonthZhi);
+                    
+                    if ((userIsWinter && idolIsSummer) || (userIsSummer && idolIsWinter)) {
+                        score += 35; currentReasons.push("❄️🔥 <b>温度调候 (+35分)</b>：你们能抚平彼此性格中的焦躁与孤独，提供情绪价值。");
+                    }
+
+                    if (zhiLiuChong.includes(dayZhiPair1) || zhiLiuChong.includes(dayZhiPair2)) {
+                        score -= 30; currentReasons.push("⚠️ <b>地支相冲 (-30分)</b>：相爱相杀的欢喜冤家，需要极大的包容心来克服差异。");
+                    }
+
+                    if (currentIdol.wuxing_need.includes(userWuxing)) {
+                        score += 30; currentReasons.push(`🔥 <b>五行互补 (+30分)</b>：你的日主【${userWuxing}】正是他命理中最渴望的能量。`);
+                    }
+
+                    if (currentIdol.zodiac === userZodiac) {
+                        score += 20; currentReasons.push("🌟 <b>星象同频 (+20分)</b>：同为" + userZodiac + "，你们连生活步调都出奇一致。");
+                    }
+
+ if (userDayGan === idolDayGan) {
+                        score += 15; currentReasons.push("👯 <b>世界上另一个我 (+15分)</b>：日干相同，性格底色极其相似，你们是彼此极致的共情者。");
+                    }
+
+                    if (userDayZhi === idolDayZhi) {
+                        score += 10; currentReasons.push("🏠 <b>100%内在合拍度 (+10分)</b>：配偶宫伏吟，内在需求和私密习惯如出一辙，灵魂高度同频。");
+                    }
+
+                    if (currentReasons.length === 0) {
+                        currentReasons.push("🌱 <b>细水长流</b>：虽然没有强烈的命理羁绊，但平平淡淡才是真。");
+                    }
+
+                    // 把这个偶像的所有信息存进数组里
+                    allResults.push({
+                        idol: currentIdol,
+                        finalScore: score,
+                        reasons: currentReasons
+                    });
+                }
+
+                // 🚨 对数组进行排序（根据 finalScore 从高到低）
+                allResults.sort((a, b) => b.finalScore - a.finalScore);
+
+                // 取前三名（如果数据库里不够3个，有几个取几个）
+                let top3 = allResults.slice(0, 3);
+
+                // --- 组装最终呈现的 HTML ---
+                let resultHtml = `
+                    <hr style="border: 0; border-top: 2px dashed #af2a2d; margin: 25px 0;">
+                    <p style="color:#666; font-size:14px;">你的八字：<strong>${userYearGanZhi}年 ${userMonthGanZhi}月 ${userDayGanZhi}日</strong><br>日主属：<strong>${userWuxing}</strong> | 星座：<strong>${userZodiac}</strong></p>
+                    <h3 style="color:#2f3542; margin-top:25px; margin-bottom: 20px;">🏆 你的楼孩契合度排行 🏆</h3>
+                `;
+
+                const medalNames = ["🥇 第一名", "🥈 第二名", "🥉 第三名"];
+                const borderColors = ["#af2a2d", "#a4b0be", "#ced6e0"];
+                const badgeColors = ["#af2a2d", "#747d8c", "#a4b0be"];
+
+                // 循环生成前三名的卡片
+                for (let k = 0; k < top3.length; k++) {
+                    let match = top3[k];
+                    
+                    // 把原因列表变成HTML
+                    let reasonsHtml = match.reasons.map(r => `<p style="text-align:left; font-size:13px; color:#555; background:#fff0f5; padding:8px; border-radius:5px; margin:5px 0; line-height: 1.5;">${r}</p>`).join('');
+
+                    // 拼接每个人的专属卡片
+                    resultHtml += `
+                        <div style="background:#fdfbfb; border: 2px solid ${borderColors[k]}; padding: 15px; border-radius: 10px; margin-bottom: 25px; position: relative;">
+                            <div style="position: absolute; top: -14px; left: 15px; background: ${badgeColors[k]}; color: white; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                                ${medalNames[k]}
+                            </div>
+                            <p style="font-size: 26px; color: ${k === 0 ? '#af2a2d' : '#2f3542'}; font-weight: bold; margin: 15px 0 5px 0; letter-spacing: 2px;">
+                                ${match.idol.name}
+                            </p>
+                            <p style="font-size: 14px; color: #ff4757; font-weight: bold; margin-bottom: 15px;">
+                                契合指数：${match.finalScore} 分
+                            </p>
+                            <div style="text-align: left;">
+                                <p style="font-size:12px; color:#999; margin-bottom:8px; font-weight:bold;">📜 详细解读</p>
+                                ${reasonsHtml}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // 把最终的HTML放进页面里
+                let resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = resultHtml;
+
+            } catch (error) {
+                console.error("报错细节：", error); 
+                alert("系统出错啦，请检查输入的日期是否正确！");
+            }
+        }
+    </script>
+
+    <div class="footer">
+        © 2026 Crafted by 
+        <a href="https://weibo.com/u/9169234293" target="_blank">@AA青森苹果汁</a> 
+        | 本测试仅供娱乐
+    </div>
+
+</body>
+</html>
